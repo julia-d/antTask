@@ -1,0 +1,70 @@
+<project name="Ant" default="jar">
+	<property file="build.properties"/>
+	
+	<target name="clean">
+		<delete dir="${report.dir}"/>
+	    <delete dir="${testdest.dir}"/>	
+		<delete dir="${jar.dir}"/>
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="${report.dir}"/>
+		<mkdir dir="${testdest.dir}"/>
+		<mkdir dir="${dest.dir}"/>
+		<mkdir dir="${jar.dir}"/>
+	</target>
+	
+	<target name="compile" depends="init">
+		<javac includeantruntime="false" srcdir="${source.dir}" destdir="${dest.dir}"/>
+	</target>
+	
+	<target name="testcompile" depends="init">
+		<javac includeantruntime="false"
+			srcdir="${test.dir}" destdir="${testdest.dir}">
+			<classpath>
+				<path id="${path}"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="test" depends="testcompile">
+		<junit>
+			<test name="TestHelloAnt"/>
+			<classpath>
+				<pathelement path="${path}"/>			
+			</classpath>
+			<classpath>
+				<pathelement path="${testdest.dir}"/>
+			</classpath>
+		</junit>
+	</target>
+
+	<target name="checkstyle" depends="init">
+		<taskdef resource="checkstyletask.properties">
+			<classpath>
+				<pathelement location="${checkstyle}"/> 
+			</classpath>
+		</taskdef>
+				
+		<checkstyle config="${checkstyleXML}">
+		  <fileset dir="${source.dir}" includes="**/*.java"/>
+		</checkstyle>
+	</target>
+
+
+	
+	<target name="eclemma" depends="test">
+	 	
+	 </target>
+
+	<target name="testreport" depends="eclemma"></target>
+		
+	<target name="jar" depends="testreport">
+			<jar destfile="${jar.dir}/HelloAnt.jar" basedir="${dest.dir}">
+			        <manifest>
+			            <attribute name="Main-Class" value="mypackage.MyMainFile"/>
+			        </manifest>
+			    </jar>
+		</target>
+		
+</project>
